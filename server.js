@@ -135,7 +135,7 @@ io.on('connection', (socket) => {
 });
 
 // --- Start server ---
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
     console.log(`Casino Rewards Engine running at http://localhost:${PORT}`);
     console.log(`House Ledger initialized at $${houseLedger.toLocaleString()}`);
