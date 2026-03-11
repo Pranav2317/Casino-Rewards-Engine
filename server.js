@@ -112,13 +112,13 @@ io.on('connection', (socket) => {
 
     // slotresult - process a slot play
     socket.on('slotresult', (number, member) => {
-        if (!number || !member || typeof number !== 'string' || typeof member !== 'string') {
-            socket.emit('errorrtn', 'ERROR: Invalid parameters');
+        if (!number || typeof number !== 'string') {
+            socket.emit('errorrtn', 'ERROR: Invalid number');
             return;
         }
 
         const sanitizedNumber = number.replace(/[^0-9]/g, '').substring(0, 3);
-        const sanitizedMember = member.substring(0, 50);
+        const sanitizedMember = (member && typeof member === 'string') ? member.substring(0, 50) : 'guest';
 
         const result = processSlotResult(sanitizedNumber, sanitizedMember);
 

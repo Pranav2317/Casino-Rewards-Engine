@@ -453,6 +453,7 @@
 
             socket.on('errorrtn', function (error) {
                 console.log(error);
+                slotenabled = true;
             });
 
             socket.on('resultreturn', function (number, win, wincredits) {
