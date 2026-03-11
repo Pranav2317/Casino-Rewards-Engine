@@ -1,0 +1,542 @@
+﻿
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Casino Rewards Engine</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style type="text/css">
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: #e0e0e0;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(90deg, #b8860b, #ffd700, #b8860b);
+            padding: 20px 40px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(255, 215, 0, 0.3);
+        }
+        .header h1 {
+            font-size: 2.2em;
+            color: #1a1a2e;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        }
+        .header p {
+            color: #2d2d44;
+            font-size: 0.85em;
+            margin-top: 6px;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Main Layout */
+        .main-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+            padding: 30px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Card Style */
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.15);
+            border-radius: 16px;
+            padding: 24px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(255, 215, 0, 0.1);
+        }
+
+        /* Slot Machine Section */
+        .slot-section {
+            text-align: center;
+            width: 320px;
+        }
+        .slot-section img {
+            width: 280px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: transform 0.15s, box-shadow 0.15s;
+            box-shadow: 0 6px 25px rgba(0, 0, 0, 0.5);
+        }
+        .slot-section img:hover {
+            transform: scale(1.03);
+            box-shadow: 0 8px 35px rgba(255, 215, 0, 0.2);
+        }
+        .slot-section img:active {
+            transform: scale(0.97);
+        }
+        .play-hint {
+            margin-top: 12px;
+            color: #ffd700;
+            font-size: 0.9em;
+            font-weight: 600;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Controls Section */
+        .controls-section {
+            width: 380px;
+        }
+
+        /* Form Groups */
+        .form-group {
+            margin-bottom: 14px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 0.75em;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #ffd700;
+            margin-bottom: 4px;
+            font-weight: 600;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.3);
+            color: #ffffff;
+            font-size: 1em;
+            font-family: 'Consolas', 'Courier New', monospace;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .form-group input:focus {
+            border-color: #ffd700;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.2);
+        }
+        .form-group input:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        .form-group input.editable {
+            border-color: rgba(255, 215, 0, 0.5);
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        /* Rewards Badge */
+        .rewards-info {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 215, 0, 0.02));
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            border-radius: 10px;
+            padding: 12px 16px;
+            margin-bottom: 14px;
+        }
+        .rewards-info .rewards-title {
+            font-size: 0.7em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #aaa;
+            margin-bottom: 4px;
+        }
+        .rewards-info .rewards-table {
+            font-size: 0.8em;
+            color: #ccc;
+        }
+        .rewards-info .rewards-table span {
+            color: #ffd700;
+            font-weight: bold;
+        }
+        #rewardsdiv {
+            display: inline;
+            color: #00ff88;
+            font-weight: bold;
+            font-size: 0.95em;
+        }
+
+        /* Winner Announcement */
+        #winnerswindow {
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        #winnerswindow b {
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.15), rgba(0, 255, 136, 0.05));
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: 10px;
+            padding: 12px 20px;
+            display: inline-block;
+            animation: winFlash 0.5s ease-in-out 3;
+            color: #00ff88 !important;
+            font-size: 1em;
+        }
+        @keyframes winFlash {
+            0%, 100% { box-shadow: 0 0 10px rgba(0, 255, 136, 0.2); }
+            50% { box-shadow: 0 0 30px rgba(0, 255, 136, 0.5); }
+        }
+
+        /* Chip Monitor */
+        .chip-monitor input {
+            font-size: 1.3em !important;
+            text-align: center;
+            letter-spacing: 8px;
+            color: #00ff88 !important;
+            background: rgba(0, 0, 0, 0.6) !important;
+            border-color: rgba(0, 255, 136, 0.3) !important;
+            animation: monitorGlow 1.5s infinite alternate;
+        }
+        @keyframes monitorGlow {
+            0% { box-shadow: 0 0 5px rgba(0, 255, 136, 0.1); }
+            100% { box-shadow: 0 0 15px rgba(0, 255, 136, 0.15); }
+        }
+
+        /* Win Stats Row */
+        .stats-row {
+            display: flex;
+            gap: 10px;
+        }
+        .stats-row .form-group {
+            flex: 1;
+        }
+
+        /* Chart Section */
+        .chart-section {
+            width: 100%;
+            max-width: 760px;
+        }
+        .chart-section canvas {
+            width: 100% !important;
+            border-radius: 8px;
+        }
+
+        /* Status indicators */
+        .status-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #00ff88;
+            margin-right: 6px;
+            animation: blink 1s infinite;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        /* Tech badge */
+        .tech-badges {
+            text-align: center;
+            padding: 10px;
+            margin-top: 10px;
+        }
+        .tech-badges span {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 0.7em;
+            margin: 3px;
+            color: #aaa;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <div class="header">
+        <h1>Casino Rewards Engine</h1>
+        <p>A full-stack real-time slot machine rewards tracking system with multi-user WebSocket communication, live analytics, and in-memory state management.</p>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-container">
+
+        <!-- Slot Machine Card -->
+        <div class="card slot-section">
+            <img id="slotmachine" src="Assets/slotmachine_slot3.png" />
+            <p class="play-hint">&#9654; Click the machine to spin</p>
+        </div>
+
+        <!-- Controls Card -->
+        <div class="card controls-section">
+            <div class="form-group">
+                <label>Rewards Card Number</label>
+                <input type="text" id="rewardsnumber" class="editable" placeholder="Enter your rewards number" />
+            </div>
+
+            <div class="form-group">
+                <label>Total Rewards Points</label>
+                <input type="text" disabled="disabled" id="rewardsamt" placeholder="0" />
+            </div>
+
+            <div class="rewards-info">
+                <div class="rewards-title">Rewards Table</div>
+                <div class="rewards-table">
+                    <span>5 Pts</span> = Free Meal &nbsp;&bull;&nbsp; <span>10 Pts</span> = Fuel Discount<br/>
+                    Enabled: <div id="rewardsdiv">None yet</div>
+                </div>
+            </div>
+
+            <div class="form-group chip-monitor">
+                <label><span class="status-dot"></span>Chip Monitor (Live)</label>
+                <input type="text" disabled="disabled" id="slotnumber" placeholder="---" />
+            </div>
+
+            <div class="stats-row">
+                <div class="form-group">
+                    <label>Winnings</label>
+                    <input type="text" disabled="disabled" id="winnings" placeholder="0" />
+                </div>
+                <div class="form-group">
+                    <label>Win Amount</label>
+                    <input type="text" disabled="disabled" id="winamt" placeholder="0" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Win Status</label>
+                <input type="text" disabled="disabled" id="winstat" placeholder="Waiting..." />
+            </div>
+
+            <div id="winnerswindow"></div>
+        </div>
+
+        <!-- Chart Card -->
+        <div class="card chart-section">
+            <canvas id="myChart" width="700" height="250"></canvas>
+        </div>
+
+    </div>
+
+    <!-- Tech Badges -->
+    <div class="tech-badges">
+        <span>Node.js</span>
+        <span>Express</span>
+        <span>Socket.IO</span>
+        <span>jQuery</span>
+        <span>Howler.js</span>
+        <span>Chart.js</span>
+        <span>HTML5 Canvas</span>
+    </div>
+
+
+
+
+
+    <script src="Scripts/jquery-1.6.4.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="Scripts/howler/src/howler.core.js"></script>
+    <script src="Scripts/Chart.js/Chart.js"></script>
+
+
+    <script>
+        var ctx = document.getElementById("myChart").getContext('2d');
+        var gradient = ctx.createLinearGradient(0, 0, 0, 250);
+        gradient.addColorStop(0, 'rgba(255, 215, 0, 0.3)');
+        gradient.addColorStop(1, 'rgba(255, 215, 0, 0.02)');
+        var myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [""],
+                datasets: [{
+                    label: 'Live Casino Ledger ($)',
+                    data: [],
+                    borderColor: '#ffd700',
+                    backgroundColor: gradient,
+                    borderWidth: 2,
+                    pointRadius: 3,
+                    pointBackgroundColor: '#ffd700',
+                    fill: true,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                scales: {
+                    xAxes: [{ display: false }],
+                    yAxes: [{
+                        ticks: { fontColor: '#aaa' },
+                        gridLines: { color: 'rgba(255,255,255,0.05)' }
+                    }]
+                },
+                legend: { labels: { fontColor: '#ccc' } }
+            }
+        });
+    </script>
+
+
+    <script type="text/javascript">
+        $(function () {
+
+            var sound = new Howl({
+                src: ['/casino/Assets/slotmachinesprite.mp3'],
+                sprite: {
+                    play: [0, 4000],
+                    win: [4000, 5000],
+                    yahoo: [10000, 4500],
+                    ping: [15000, 1000]
+                }
+            });
+
+            var socket = io();
+            var slotenabled = false;
+            var winnings = 0;
+
+            socket.on('numberreturn', function (message) {
+                $('#slotnumber').val(message);
+            });
+
+            socket.on('annoucewinner', function (winner) {
+                sound.play('yahoo');
+                console.log(winner + " has hit a winner!");
+                $('#winnerswindow').html("<b style='color:green;'>WE HAVE A WINNER! <br> CONGRATS REWARDS MEMBER " + winner + "</b>");
+                setTimeout(function () {
+                    $('#winnerswindow').html("");
+                }, 5000);
+            });
+
+            socket.on('returnledger', function (amt) {
+                console.log("Current Ledger $" + amt);
+                addData(myChart, "", amt);
+            });
+
+            function addData(chart, label, data) {
+                chart.data.labels.push(label);
+                chart.data.datasets.forEach((dataset) => {
+                    dataset.data.push(data);
+                });
+                chart.update();
+            }
+
+            var freemealping = false;
+            var fuelping = false;
+
+            socket.on('rewardsreturn', function (rewardamt) {
+                console.log(rewardamt);
+                $('#rewardsamt').val(rewardamt);
+
+                var rewardrtn = "";
+                if (rewardamt >= 5) {
+                    rewardrtn += "Free Meal! ";
+                    if (freemealping != true) {
+                        sound.play('ping');
+                        freemealping = true;
+                    }
+                }
+                if (rewardamt >= 10) {
+                    rewardrtn += "Fuel Discount! ";
+                    if (fuelping != true) {
+                        sound.play('ping');
+                        fuelping = true;
+                    }
+                }
+
+                $('#rewardsdiv').text(rewardrtn);
+            });
+
+            socket.on('errorrtn', function (error) {
+                console.log(error);
+            });
+
+            socket.on('resultreturn', function (number, win, wincredits) {
+                setTimeout(function () {
+                    console.log(number + " " + win + " " + wincredits);
+
+                    // Render slot result: draw number on the result image using canvas
+                    var resultImg = new Image();
+                    resultImg.crossOrigin = 'anonymous';
+                    resultImg.onload = function () {
+                        var c = document.createElement('canvas');
+                        c.width = resultImg.width;
+                        c.height = resultImg.height;
+                        var ctx2 = c.getContext('2d');
+                        ctx2.drawImage(resultImg, 0, 0);
+                        // Format number with spaces like the C# version
+                        var displayText = number;
+                        if (displayText.length >= 1) displayText = displayText.substring(0, 1) + ' ' + displayText.substring(1);
+                        if (displayText.length >= 3) displayText = displayText.substring(0, 3) + '  ' + displayText.substring(3);
+                        ctx2.font = '25px Arial';
+                        ctx2.fillStyle = '#000000';
+                        ctx2.fillText(displayText, 85, 390);
+                        $('#slotmachine').attr('src', c.toDataURL('image/jpeg'));
+                    };
+                    resultImg.src = 'Assets/slotmachine_result.jpg';
+
+                    if (win == true) {
+                        sound.play('win');
+                    }
+
+                    winnings = winnings + wincredits;
+
+                    $('#winnings').val(winnings);
+                    $('#winstat').val(win);
+                    $('#winamt').val(wincredits);
+
+                    slotenabled = true;
+                    socket.emit('genrewards', $('#rewardsnumber').val());
+                }, 3400);
+            });
+
+
+
+            // User types rewards number directly into the input field
+
+
+
+
+            socket.on('connect', function () {
+                sound.play('ping');
+                slotenabled = true;
+
+                var slotchiptimer = setInterval(function () {
+                    socket.emit('genslots');
+                }, 300);
+
+                var ledgertimer = setInterval(function () {
+                    socket.emit('getledger');
+                }, 10000);
+
+                var rewardsupdate = setInterval(function () {
+                    socket.emit('genrewards', $('#rewardsnumber').val());
+                }, 5000);
+
+                $('#slotmachine').click(function () {
+                    if (slotenabled != false) {
+                        sound.play('play');
+                        $('#slotmachine').attr("src", "Assets/slotmachine_fullspin.png");
+                        slotenabled = false;
+                        socket.emit('slotresult', $('#slotnumber').val(), $('#rewardsnumber').val());
+                    }
+                });
+            });
+
+        });
+    </script>
+
+
+
+
+
+
+
+
+
+</body>
+</html>
